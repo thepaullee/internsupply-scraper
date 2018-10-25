@@ -3,6 +3,7 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
+
 def simple_get(url):
     #Makes HTTP GET request to passed url, returns raw content
     try:
@@ -15,7 +16,21 @@ def simple_get(url):
     except RequestException as e:
         log_error('Error during request to {0} : {1}'.format(url, str(e)))
         return None
-        
+
+def get_companies():
+    #Extracts company info from website and returns a list
+
+    url="https://intern.supply"
+    response = simple_get(url)
+    companies = set()
+
+    if response is not None: 
+        html = BeautifulSoup(response, 'html.parser')
+        #Adds sub title text as well, need to clean up select
+        for p in html.select('p'):
+            if 'title' in p['class']:
+                companies.add(p.text)
+    return list(companies)
     
 def is_good_response(resp):
     #Returns true if reponse is HTML, false otherwise
@@ -26,3 +41,6 @@ def is_good_response(resp):
 def log_error(e):
     #Prints errors
     print(e)
+
+if __name__ == '__main__':
+    print(get_companies())
